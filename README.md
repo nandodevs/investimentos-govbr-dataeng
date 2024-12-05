@@ -1,4 +1,4 @@
-# Investimentos GovBR DataEng
+# Investimentos GovBR em 2024
 
 ## 📜 Descrição
 Este projeto realiza o processamento e análise dos **Investimentos Públicos do Governo Brasileiro no ano de 2024**, utilizando um pipeline de engenharia de dados completo. Ele inclui etapas de ETL (Extração, Transformação e Carga), armazenamento em cloud (AWS S3), orquestração de tarefas com Apache Airflow e exposição de dados via API (FastAPI).
