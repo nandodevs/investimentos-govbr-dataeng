@@ -13,25 +13,38 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  airflow:
+  airflow-webserver:
     image: apache/airflow:2.7.0
-    container_name: airflow
+    container_name: airflow_webserver
     environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__CORE__EXECUTOR: 'LocalExecutor'
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: 'postgresql+psycopg2://airflow:airflow@postgres:5432/airflow'
     ports:
       - "8080:8080"
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
-      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+      - ./plugins:/opt/airflow/plugins
+    command: airflow webserver
     depends_on:
       - postgres
-    command: >
-      bash -c "airflow db init &&
-               airflow users create --username admin --password admin --firstname Air --lastname Flow --role Admin --email admin@example.com &&
-               airflow webserver"
+      - airflow-scheduler
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    container_name: airflow_scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: airflow scheduler
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:

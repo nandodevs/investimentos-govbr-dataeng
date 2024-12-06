@@ -6,6 +6,6 @@ __pycache__/
 .env
 *.db
 *.log
-*log
+*logs/
 .venv
 __pycache__
