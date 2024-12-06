@@ -9,3 +9,5 @@ __pycache__/
 *logs/
 .venv
 __pycache__
+.env
+investimentos_2024.csv

@@ -42,7 +42,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: airflow scheduler
+    command: bash -c "airflow db upgrade && airflow scheduler"
     depends_on:
       - postgres
 
