@@ -15,12 +15,15 @@ services:
 
   airflow-webserver:
     image: apache/airflow:2.7.0
+    env_file:
+      - .env
     container_name: airflow_webserver
     environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      
     ports:
       - "8080:8080"
     volumes:
@@ -36,8 +39,10 @@ services:
     image: apache/airflow:2.7.0
     container_name: airflow_scheduler
     environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR = LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN = postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
