@@ -7,7 +7,7 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 # URL do dataset
 DATASET_URL = "https://www.tesourotransparente.gov.br/ckan/dataset/e048826b-b6b0-4d92-9204-fd218b1f25b3/resource/5748b19a-c652-4327-a5a0-e09109e8f9e9/download/Investimentos---TT---2024.csv"
-LOCAL_FILE_PATH = "/opt/airflow/data/raw/investimentos_2024.csv"
+LOCAL_FILE_PATH = "/opt/airflow/data/investimentos_2024.csv"
 S3_BUCKET_NAME = "investimentos-govbr"
 S3_KEY = "raw/investimentos_2024.csv"
 
@@ -42,7 +42,7 @@ with DAG(
     dag_id="etl_investimentos_2024",
     default_args=default_args,
     description="Pipeline ETL - Investimentos Públicos 2024",
-    schedule_interval="@daily",
+    #schedule_interval="@daily",
     start_date=datetime(2023, 12, 1),
     catchup=False,
 ) as dag:
