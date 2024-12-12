@@ -1,1 +1,0 @@
-url = "https://www.tesourotransparente.gov.br/ckan/dataset/e048826b-b6b0-4d92-9204-fd218b1f25b3/resource/5748b19a-c652-4327-a5a0-e09109e8f9e9/download/Investimentos---TT---2024.csv"
