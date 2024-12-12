@@ -42,7 +42,7 @@ with DAG(
     dag_id="etl_investimentos_2024",
     default_args=default_args,
     description="Pipeline ETL - Investimentos Públicos 2024",
-    #schedule_interval="@daily",
+    schedule_interval="@daily",
     start_date=datetime(2023, 12, 1),
     catchup=False,
 ) as dag:

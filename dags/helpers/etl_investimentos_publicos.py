@@ -104,6 +104,7 @@ def load_data_to_postgres(**kwargs):
         'datetime64[ns]': 'TIMESTAMP',
     }
 
+
     column_types = {}
     for column in df.columns:
         dtype = str(df[column].dtype)
@@ -151,21 +152,22 @@ def load_data_to_postgres(**kwargs):
     
 # Configurações básicas da DAG
 default_args = {
-    'owner': 'airflow',
+    'owner': 'Sisnando Junior',
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    "retry_delay": timedelta(minutes=2),
+    "max_active_runs_per_dag": 1,
 }
 
 with DAG(
     dag_id='etl_investimentos_publicos',
     default_args=default_args,
     description='Pipeline ETL para processar dados de investimentos públicos no S3 e carregar no PostgreSQL',
-    schedule_interval=None,
-    start_date=datetime(2024, 12, 1),
-    catchup=False,
+    schedule_interval = timedelta(days=1),
+    start_date=datetime(2023, 12, 1),
+    tags=['ETL para S3 AWS'],
+    catchup=False
 ) as dag:
 
     # Define as tarefas da DAG
