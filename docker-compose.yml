@@ -19,11 +19,10 @@ services:
       - .env
     container_name: airflow_webserver
     environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
-      
     ports:
       - "8080:8080"
     volumes:
@@ -34,13 +33,17 @@ services:
     depends_on:
       - postgres
       - airflow-scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      retries: 3
 
   airflow-scheduler:
     image: apache/airflow:2.7.0
     container_name: airflow_scheduler
     environment:
-      - AIRFLOW__CORE__EXECUTOR = LocalExecutor
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN = postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
     volumes:
@@ -48,6 +51,20 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
     command: bash -c "airflow db upgrade && airflow scheduler"
+    depends_on:
+      - postgres
+
+  airflow-triggerer:
+    image: apache/airflow:2.7.0
+    container_name: airflow_triggerer
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: airflow triggerer
     depends_on:
       - postgres
 
