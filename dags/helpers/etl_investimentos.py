@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+
 import requests
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -46,7 +47,6 @@ with DAG(
     start_date=datetime(2023, 12, 1),
     catchup=False,
 ) as dag:
-
     download_task = PythonOperator(
         task_id="download_dataset",
         python_callable=download_dataset,

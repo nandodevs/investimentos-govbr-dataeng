@@ -128,6 +128,7 @@ PyJWT==2.10.1
 pytest==8.3.4
 python-daemon==3.1.2
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 python-nvd3==0.16.0
 python-slugify==8.0.4
 pytz==2024.2

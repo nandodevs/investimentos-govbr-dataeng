@@ -1,11 +1,12 @@
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-from datetime import datetime, timedelta
-import pandas as pd
-import boto3
 import io
 import os
+from datetime import datetime, timedelta
+
+import boto3
+import pandas as pd
 import psycopg2
+from airflow import DAG
+from airflow.operators.python import PythonOperator
 
 # Variáveis de ambiente para credenciais AWS
 account_key = os.getenv('AWS_ACCESS_KEY')
@@ -13,7 +14,7 @@ secret_key = os.getenv('AWS_SECRET_KEY')
 
 
 # Função para baixar o arquivo do S3
-def download_dataset(**kwargs):
+def download_dataset():
     s3 = boto3.client('s3', aws_access_key_id=account_key, aws_secret_access_key=secret_key)
     bucket_name = 'investimentos-govbr'
     object_key = 'raw/investimentos_2024.csv'
@@ -24,6 +25,8 @@ def download_dataset(**kwargs):
         print(f"Arquivo {object_key} baixado para {local_file_path}")
     except s3.exceptions.NoSuchKey:
         print(f"Arquivo {object_key} não encontrado no bucket {bucket_name}. Verifique o caminho.")
+
+
 # Função para fazer o upload do arquivo processado para o S3
 def upload_to_s3(local_file_path, s3_bucket, s3_key):
     s3 = boto3.client('s3', aws_access_key_id=account_key, aws_secret_access_key=secret_key)
@@ -34,8 +37,9 @@ def upload_to_s3(local_file_path, s3_bucket, s3_key):
     except Exception as e:
         print(f"Erro ao enviar o arquivo {local_file_path} para o S3: {str(e)}")
 
+
 # Função para transformar os dados
-def transform_data_s3(**kwargs):
+def transform_data_s3():
     s3 = boto3.client('s3', aws_access_key_id=account_key, aws_secret_access_key=secret_key)
     bucket_name = 'investimentos-govbr'
     source_key = 'raw/investimentos_2024.csv'
@@ -64,6 +68,7 @@ def transform_data_s3(**kwargs):
     
     for col in col_for_int:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+        
     # Limpar e converter a coluna 'movimento_liquido_reais'
     df['movimento_liquido_reais'] = (
         df['movimento_liquido_reais']
@@ -72,10 +77,6 @@ def transform_data_s3(**kwargs):
         .str.replace(r'\((.*?)\)', r'-\1', regex=True)  # Converte (valor) para -valor
         .astype(float)  # Converte para float
     )
-    print(df.dtypes)
-    
-    # Remove linhas com valores nulos apenas nas colunas relevantes
-    #df.dropna(subset=['ano', 'mes', 'esfera_orcamentaria'], inplace=True)
 
     # Salva o arquivo transformado localmente
     local_file_path = '/tmp/investimentos_2024_mod.csv'
@@ -83,8 +84,9 @@ def transform_data_s3(**kwargs):
     # Faz upload do arquivo transformado para a pasta processed/ no S3
     upload_to_s3(local_file_path, bucket_name, dest_key)
 
+
 # Função para carregar os dados no PostgreSQL
-def load_data_to_postgres(**kwargs):
+def load_data_to_postgres():
     
     # Conexão ao S3
     s3 = boto3.client('s3', aws_access_key_id=account_key, aws_secret_access_key=secret_key)
